@@ -3,9 +3,10 @@ import com.smitestats.Dependencies._
 name := """data-collector-service"""
 
 lazy val commons = Seq(
-    version := "1.0-SNAPSHOT",    
+    version := "0.1-SNAPSHOT",    
     scalaVersion := "2.13.5",
-    organization := "com.smitestats"    
+    organization := "com.smitestats",
+    scalacOptions += "-Ymacro-annotations"
 )
 
 lazy val root = project
@@ -20,6 +21,15 @@ lazy val service = project
         libraryDependencies ++= Seq(
             Cats.core,
             Cats.effect,
+            Circe.core,
+            Circe.generic,
+            Circe.parser,
+            Circe.literal,
+            Http4s.dsl,
+            Http4s.client,
+            Http4s.circe,
+            ScalaCache.core,
+            ScalaConfig.core,
             ScalaTest.core
         )
     )
