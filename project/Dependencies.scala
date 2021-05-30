@@ -29,9 +29,12 @@ object Dependencies {
         val generic = "io.circe" %% "circe-generic" % circeVersion
         val parser = "io.circe" %% "circe-parser" % circeVersion
         val literal = "io.circe" %% "circe-literal" % circeVersion
+        val config = "io.circe" %% "circe-config" % "0.7.0"
     }
 
-    object ScalaConfig {
-        val core = "com.github.andr83" %% "scalaconfig" % "0.7"
+    object SLF4J {
+        private val slf4jVersion = "1.7.5"
+        val api = "org.slf4j" % "slf4j-api" % slf4jVersion
+        val simple = "org.slf4j" % "slf4j-simple" % slf4jVersion
     }
 }

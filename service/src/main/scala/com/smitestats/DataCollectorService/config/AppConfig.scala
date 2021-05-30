@@ -1,6 +1,9 @@
 package com.smitestats.DataCollectorService.config
 
-import com.github.andr83.scalaconfig._
+import cats.effect.IO
+import io.circe.generic.auto._
+import io.circe.config.syntax._
+import io.circe.config.parser
 
 case class AppConfig(
     devId: String,
@@ -9,8 +12,5 @@ case class AppConfig(
 )
 
 object AppConfig {
-    val loaded: AppConfig = {
-        val config: Config = ConfigFactory.load()
-
-    }
+    lazy val loaded: IO[AppConfig] = parser.decodeF[IO, AppConfig]
 }

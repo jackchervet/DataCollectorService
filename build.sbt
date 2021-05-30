@@ -25,11 +25,13 @@ lazy val service = project
             Circe.generic,
             Circe.parser,
             Circe.literal,
+            Circe.config,
             Http4s.dsl,
             Http4s.client,
             Http4s.circe,
             ScalaCache.core,
-            ScalaConfig.core,
-            ScalaTest.core
+            ScalaTest.core,
+            SLF4J.api,
+            SLF4J.simple
         )
     )
