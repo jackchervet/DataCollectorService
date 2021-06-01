@@ -1,13 +1,14 @@
 package com.smitestats.matchidservice.clients
 
-import com.smitestats.matchidservice.models.GetMatchIdsByQueueResponse
 import com.smitestats.matchidservice.helpers.SignatureHelper
+import com.smitestats.matchidservice.helpers.SessionHelper
 import com.smitestats.matchidservice.config.AppConfig
+import com.smitestats.matchidservice.models.GetMatchIdsByQueueResponse
+import com.smitestats.matchidservice.models.GetMatchDetailsBatchResponse
 
 import cats._
 import cats.implicits._
 import cats.effect._
-import com.smitestats.matchidservice.helpers.SessionHelper
 import scala.concurrent._
 
 import org.http4s.client.blaze._
@@ -17,7 +18,6 @@ import scalacache._
 import scalacache.guava._
 
 import io.circe.generic.semiauto._
-import com.smitestats.matchidservice.models.MatchIdResponse
 import java.time.LocalDateTime
 import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter
@@ -55,7 +55,6 @@ object SmiteApiClient {
         config: AppConfig
     ): IO[List[String]] = { 
         for {
-            _ <- IO(logger.info("Retrieving MatchIds..."))
             timestamp <- IO { SignatureHelper.getCurrentTimestamp }
             signature <- SignatureHelper.generateSignature(endpoints.getMatchIdsByQueue, timestamp)
             session <- SessionHelper.getSession
@@ -70,7 +69,31 @@ object SmiteApiClient {
                 s"${getDateOneHourPrev}/" +
                 s"${getHourValueFormatted}"
             }
-            resp <- client.expect[List[MatchIdResponse]](target)
+            resp <- client.expect[List[GetMatchIdsByQueueResponse]](target)
         } yield resp.filter(r => r.Active_Flag == "n").map(r => r.Match)
+    }
+
+    def getMatchDetailsBatch(ids: List[String])(implicit 
+        client: Client[IO], 
+        sessionCache: Cache[String], 
+        ec: ExecutionContext, 
+        cs: ContextShift[IO],
+        config: AppConfig
+    ): IO[List[GetMatchDetailsBatchResponse]] = { 
+        for {
+            timestamp <- IO { SignatureHelper.getCurrentTimestamp }
+            signature <- SignatureHelper.generateSignature(endpoints.getMatchDetailsBatch, timestamp)
+            session <- SessionHelper.getSession
+            target <- IO {
+                s"${config.smiteApiBaseUrl}/" +
+                s"${endpoints.getMatchDetailsBatch}/" +
+                s"${config.devId}/" +
+                s"${signature}/" +
+                s"${session}/" +
+                s"${timestamp}/" +
+                s"${ids.mkString(",")}"
+            }
+            resp <- client.expect[List[GetMatchDetailsBatchResponse]](target)
+        } yield resp
     }
 }

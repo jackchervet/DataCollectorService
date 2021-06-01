@@ -22,13 +22,12 @@ import io.circe.parser._
 import io.circe.syntax._
 import com.amazonaws.services.sqs.{AmazonSQS, AmazonSQSClient}
 
-object Main {
+class Main {
 
     val logger: Logger = LoggerFactory.getLogger("Main")
     implicit val ec: ExecutionContext = ExecutionContext.global
     implicit val cs: ContextShift[IO] = IO.contextShift(ec) 
     implicit val sessionCache: Cache[String] = GuavaCache[String]
-    implicit val sqs: AmazonSQS = AmazonSQSClient.builder().build()
 
     def run(input: InputStream, output: OutputStream, context: Context): Unit = {
         (for {
@@ -36,7 +35,7 @@ object Main {
             config <- AppConfig.loaded
             _ <- IO { logger.info("Beginning processing...") }
             _ <- BlazeClientBuilder[IO](ec).resource.use { client =>
-                Processor.process(ec, cs, config, client, sessionCache, sqs)
+                Processor.process(ec, cs, config, client, sessionCache)
             }
         } yield ()).unsafeRunSync
     }
