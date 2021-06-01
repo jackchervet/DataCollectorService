@@ -3,7 +3,7 @@ import com.smitestats.Dependencies._
 name := """match-id-service"""
 
 lazy val commons = Seq(
-    version := "1.0.0-SNAPSHOT",    
+    version := "1.0.1-SNAPSHOT",    
     scalaVersion := "2.13.6",
     organization := "com.smitestats",
     scalacOptions += "-Ymacro-annotations"
