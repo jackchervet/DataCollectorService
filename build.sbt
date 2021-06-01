@@ -1,17 +1,13 @@
 import com.smitestats.Dependencies._
 
-name := """data-collector-service"""
+name := """match-id-service"""
 
 lazy val commons = Seq(
-    version := "0.1-SNAPSHOT",    
-    scalaVersion := "2.13.5",
+    version := "1.0.0-SNAPSHOT",    
+    scalaVersion := "2.13.6",
     organization := "com.smitestats",
     scalacOptions += "-Ymacro-annotations"
 )
-
-lazy val root = project
-    .in(file("."))
-    .settings(commons)
 
 lazy val service = project
     .in(file("service"))
@@ -19,6 +15,8 @@ lazy val service = project
         name := "service",
         commons,
         libraryDependencies ++= Seq(
+            AWS.lambda,
+            AWS.sqs,
             Cats.core,
             Cats.effect,
             Circe.core,
@@ -26,6 +24,8 @@ lazy val service = project
             Circe.parser,
             Circe.literal,
             Circe.config,
+            FS2.core,
+            FS2.io,
             Http4s.dsl,
             Http4s.client,
             Http4s.circe,
@@ -33,5 +33,8 @@ lazy val service = project
             ScalaTest.core,
             SLF4J.api,
             SLF4J.simple
-        )
+        ),
+        assembly / mainClass := Some("com.smitestats.matchidservice.Main"),
+        assembly / assemblyOption := (assembly / assemblyOption).value.copy(cacheUnzip = false),
+        assembly / assemblyOption := (assembly / assemblyOption).value.copy(cacheOutput = false)
     )

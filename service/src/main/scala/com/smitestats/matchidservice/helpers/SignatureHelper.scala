@@ -1,6 +1,6 @@
-package com.smitestats.DataCollectorService.helpers
+package com.smitestats.matchidservice.helpers
 
-import com.smitestats.DataCollectorService.config.AppConfig
+import com.smitestats.matchidservice.config.AppConfig
 import java.security.MessageDigest
 import java.math.BigInteger
 import java.time.LocalDateTime

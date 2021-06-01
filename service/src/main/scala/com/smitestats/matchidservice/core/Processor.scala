@@ -1,18 +1,19 @@
-package com.smitestats.DataCollectorService.core
+package com.smitestats.matchidservice.core
 
 import org.http4s.client.Client
 import cats.effect.IO
 import scala.concurrent.ExecutionContext
 import cats.effect.ContextShift
-import com.smitestats.DataCollectorService.config.AppConfig
+import com.smitestats.matchidservice.config.AppConfig
 import scalacache._
 import scalacache.guava._
-import com.smitestats.DataCollectorService.clients.SmiteApiClient
-import com.smitestats.DataCollectorService.models.QueueType
+import com.smitestats.matchidservice.clients.SmiteApiClient
+import com.smitestats.matchidservice.models.QueueType
 import java.time.LocalDate
-import com.smitestats.DataCollectorService.helpers.SignatureHelper
+import com.smitestats.matchidservice.helpers.SignatureHelper
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import com.amazonaws.services.sqs.AmazonSQS
 
 object Processor {
     val logger: Logger = LoggerFactory.getLogger("Processor")
@@ -22,11 +23,13 @@ object Processor {
         cs: ContextShift[IO], 
         config: AppConfig, 
         client: Client[IO],
-        sessionCache: Cache[String]
+        sessionCache: Cache[String],
+        sqs: AmazonSQS
     ): IO[Unit] = {
         for {
+            _ <- IO(logger.info("Making API call..."))
             matchIds <- SmiteApiClient.getMatchIdsByQueue(QueueType.CONQUEST)
-            _ <- IO(logger.info("MatchIds: " + matchIds.take(20)))
+            _ <- SQS.sendBatches(matchIds)
         } yield ()
     }
 

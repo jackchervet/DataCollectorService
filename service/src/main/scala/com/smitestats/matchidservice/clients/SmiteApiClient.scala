@@ -1,13 +1,13 @@
-package com.smitestats.DataCollectorService.clients
+package com.smitestats.matchidservice.clients
 
-import com.smitestats.DataCollectorService.models.GetMatchIdsByQueueResponse
-import com.smitestats.DataCollectorService.helpers.SignatureHelper
-import com.smitestats.DataCollectorService.config.AppConfig
+import com.smitestats.matchidservice.models.GetMatchIdsByQueueResponse
+import com.smitestats.matchidservice.helpers.SignatureHelper
+import com.smitestats.matchidservice.config.AppConfig
 
 import cats._
 import cats.implicits._
 import cats.effect._
-import com.smitestats.DataCollectorService.helpers.SessionHelper
+import com.smitestats.matchidservice.helpers.SessionHelper
 import scala.concurrent._
 
 import org.http4s.client.blaze._
@@ -17,12 +17,16 @@ import scalacache._
 import scalacache.guava._
 
 import io.circe.generic.semiauto._
-import com.smitestats.DataCollectorService.models.MatchIdResponse
+import com.smitestats.matchidservice.models.MatchIdResponse
 import java.time.LocalDateTime
 import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter
+import org.slf4j.LoggerFactory
+import org.slf4j.Logger
 
 object SmiteApiClient {
+
+    val logger: Logger = LoggerFactory.getLogger("SmiteApiClient")
 
     object endpoints {
         val getMatchIdsByQueue = "getmatchidsbyqueueJson"
@@ -51,6 +55,7 @@ object SmiteApiClient {
         config: AppConfig
     ): IO[List[String]] = { 
         for {
+            _ <- IO(logger.info("Retrieving MatchIds..."))
             timestamp <- IO { SignatureHelper.getCurrentTimestamp }
             signature <- SignatureHelper.generateSignature(endpoints.getMatchIdsByQueue, timestamp)
             session <- SessionHelper.getSession

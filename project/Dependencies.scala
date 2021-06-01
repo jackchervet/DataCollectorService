@@ -3,6 +3,11 @@ package com.smitestats
 import sbt._
 
 object Dependencies {
+    object AWS {
+        val lambda = "com.amazonaws" % "aws-lambda-java-core" % "1.2.1"
+        val sqs = "com.amazonaws" % "aws-java-sdk-sqs" % "1.11.1030" 
+    }
+    
     object Cats {
         val core = "org.typelevel" %% "cats-core" % "2.1.1"
         val effect = "org.typelevel" %% "cats-effect" % "2.1.1"
@@ -36,5 +41,11 @@ object Dependencies {
         private val slf4jVersion = "1.7.5"
         val api = "org.slf4j" % "slf4j-api" % slf4jVersion
         val simple = "org.slf4j" % "slf4j-simple" % slf4jVersion
+    }
+
+    object FS2 {
+        private val fs2Version = "2.5.3"
+        val core = "co.fs2" %% "fs2-core" % fs2Version
+        val io = "co.fs2" %% "fs2-io" % fs2Version
     }
 }
