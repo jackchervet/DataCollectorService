@@ -20,7 +20,7 @@ import scala.io.Source
 
 import io.circe.parser._
 import io.circe.syntax._
-import com.amazonaws.services.sqs.{AmazonSQS, AmazonSQSClient}
+import software.amazon.awssdk.services.dynamodb.DynamoDbClient
 
 class Main {
 
@@ -28,6 +28,7 @@ class Main {
     implicit val ec: ExecutionContext = ExecutionContext.global
     implicit val cs: ContextShift[IO] = IO.contextShift(ec) 
     implicit val sessionCache: Cache[String] = GuavaCache[String]
+    implicit val ddb: DynamoDbClient = DynamoDbClient.create()
 
     def run(input: InputStream, output: OutputStream, context: Context): Unit = {
         (for {
@@ -35,7 +36,7 @@ class Main {
             config <- AppConfig.loaded
             _ <- IO { logger.info("Beginning processing...") }
             _ <- BlazeClientBuilder[IO](ec).resource.use { client =>
-                Processor.process(ec, cs, config, client, sessionCache)
+                Processor.process(ec, cs, config, client, sessionCache, ddb)
             }
         } yield ()).unsafeRunSync
     }

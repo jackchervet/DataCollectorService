@@ -5,7 +5,7 @@ import sbt._
 object Dependencies {
     object AWS {
         val lambda = "com.amazonaws" % "aws-lambda-java-core" % "1.2.1"
-        val sqs = "com.amazonaws" % "aws-java-sdk-sqs" % "1.11.1030" 
+        val dynamodb = "software.amazon.awssdk" % "dynamodb" % "2.16.78" 
     }
     
     object Cats {
@@ -14,7 +14,8 @@ object Dependencies {
     }
 
     object ScalaTest {
-        val core = "org.scalatestplus.play" %% "scalatestplus-play" % "5.0.0" % Test
+       val scalatic = "org.scalactic" %% "scalactic" % "3.2.9"
+       val core = "org.scalatest" %% "scalatest" % "3.2.9" % "test"
     }
 
     object Http4s {

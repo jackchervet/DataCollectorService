@@ -11,24 +11,25 @@ import com.smitestats.matchidservice.clients.SmiteApiClient
 import com.smitestats.matchidservice.models.QueueType
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import com.amazonaws.services.sqs.AmazonSQS
 import fs2._
 import com.smitestats.matchidservice.models.GetMatchDetailsBatchResponse
+import software.amazon.awssdk.services.dynamodb.DynamoDbClient
 
 object Processor {
     val logger: Logger = LoggerFactory.getLogger("Processor")
 
     def process(implicit 
-        ec: ExecutionContext, 
+        ec: ExecutionContext,  
         cs: ContextShift[IO], 
         config: AppConfig, 
         client: Client[IO],
-        sessionCache: Cache[String]
+        sessionCache: Cache[String],
+        ddb: DynamoDbClient
     ): IO[Unit] = {
         for {
             _ <- IO(logger.info("Getting Match Ids..."))
             matchIds <- SmiteApiClient.getMatchIdsByQueue(QueueType.CONQUEST)
-            _ <- Stream.emits(matchIds)
+            matchDetails <- Stream.emits(matchIds)
                 .chunkN(10)
                 .evalMap { chunk => 
                     for {
@@ -36,10 +37,11 @@ object Processor {
                         matchDetails <- SmiteApiClient.getMatchDetailsBatch(chunk.toList).handleErrorWith { e =>
                             IO(logger.error(s"[ERROR] Failed to retrieve match details for matchIds ${chunk.toList}... ${e}")) *> IO(List(GetMatchDetailsBatchResponse()))
                         }
-                    } yield ()
+                    } yield matchDetails
                 }
                 .compile
-                .drain
+                .toList
+            _ <- DDB.batchWriteItems(matchDetails.flatten)
         } yield ()
     }
 
