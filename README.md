@@ -1,11 +1,11 @@
 # DataCollectorService
 
-Lambda function for retrieving recent Match Ids from SMITE API.
+Lambda function for retrieving sampling of recent Match data from SMITE API.
 
 ## Contract
 
-- Downstream SQS: MatchIdQueue
-- Runs on CRON schedule every 10 min
+- Downstream DDB: match-data-raw
+- Runs on CRON schedule every 60 min
 
 ## Building
 

@@ -1,18 +1,18 @@
-package com.smitestats.matchidservice
+package com.smitestats.datacollectorservice
 
 import cats.effect._
 import cats.syntax.all._
 import scalacache._
 import scalacache.guava._
-import com.smitestats.matchidservice.config.AppConfig
+import com.smitestats.datacollectorservice.config.AppConfig
 import scala.concurrent.ExecutionContext
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.http4s.client.blaze.BlazeClientBuilder
-import com.smitestats.matchidservice.clients.SmiteApiClient
-import com.smitestats.matchidservice.helpers.SessionHelper
-import com.smitestats.matchidservice.helpers.SignatureHelper
-import com.smitestats.matchidservice.core.Processor
+import com.smitestats.datacollectorservice.clients.SmiteApiClient
+import com.smitestats.datacollectorservice.helpers.SessionHelper
+import com.smitestats.datacollectorservice.helpers.SignatureHelper
+import com.smitestats.datacollectorservice.core.Processor
 import java.io.InputStream
 import java.io.OutputStream
 import com.amazonaws.services.lambda.runtime.Context

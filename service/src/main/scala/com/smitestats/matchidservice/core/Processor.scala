@@ -1,18 +1,18 @@
-package com.smitestats.matchidservice.core
+package com.smitestats.datacollectorservice.core
 
 import org.http4s.client.Client
 import cats.effect.IO
 import scala.concurrent.ExecutionContext
 import cats.effect.ContextShift
-import com.smitestats.matchidservice.config.AppConfig
+import com.smitestats.datacollectorservice.config.AppConfig
 import scalacache._
 import scalacache.guava._
-import com.smitestats.matchidservice.clients.SmiteApiClient
-import com.smitestats.matchidservice.models.QueueType
+import com.smitestats.datacollectorservice.clients.SmiteApiClient
+import com.smitestats.datacollectorservice.models.QueueType
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import fs2._
-import com.smitestats.matchidservice.models.GetMatchDetailsBatchResponse
+import com.smitestats.datacollectorservice.models.GetMatchDetailsBatchResponse
 import software.amazon.awssdk.services.dynamodb.DynamoDbClient
 
 object Processor {

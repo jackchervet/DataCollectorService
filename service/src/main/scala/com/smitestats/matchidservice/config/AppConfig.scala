@@ -1,4 +1,4 @@
-package com.smitestats.matchidservice.config
+package com.smitestats.datacollectorservice.config
 
 import cats.effect.IO
 import io.circe.generic.auto._

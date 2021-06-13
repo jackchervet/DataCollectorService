@@ -3,12 +3,12 @@ package com.smitestats
 import org.scalatest._
 import matchers.should._
 import org.scalatest.wordspec.AnyWordSpec
-import com.smitestats.matchidservice.core.DDB
-import com.smitestats.matchidservice.models.GetMatchDetailsBatchResponse
+import com.smitestats.datacollectorservice.core.DDB
+import com.smitestats.datacollectorservice.models.GetMatchDetailsBatchResponse
 import java.time.format.DateTimeFormatter
 import java.time.LocalDateTime
 import java.time.ZoneOffset
-import com.smitestats.matchidservice.config.AppConfig
+import com.smitestats.datacollectorservice.config.AppConfig
 
 class DDBSpec extends AnyWordSpec with Matchers {
 

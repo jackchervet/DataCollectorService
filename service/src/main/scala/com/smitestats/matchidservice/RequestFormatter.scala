@@ -1,4 +1,4 @@
-package com.smitestats.matchidservice
+package com.smitestats.datacollectorservice
 
 import io.circe._
 import io.circe.generic.semiauto._

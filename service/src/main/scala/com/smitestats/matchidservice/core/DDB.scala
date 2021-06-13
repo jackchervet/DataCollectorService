@@ -1,12 +1,12 @@
-package com.smitestats.matchidservice.core
+package com.smitestats.datacollectorservice.core
 
 import fs2.{Pipe, Chunk, Stream}
 import cats.effect._
 import io.circe.syntax._
-import com.smitestats.matchidservice.models.GetMatchDetailsBatchResponse
+import com.smitestats.datacollectorservice.models.GetMatchDetailsBatchResponse
 
 import scala.collection.JavaConverters._
-import com.smitestats.matchidservice.config.AppConfig
+import com.smitestats.datacollectorservice.config.AppConfig
 import software.amazon.awssdk.services.dynamodb.model.AttributeValue
 import software.amazon.awssdk.services.dynamodb.model.BatchWriteItemRequest
 import software.amazon.awssdk.services.dynamodb.model.WriteRequest

@@ -1,4 +1,4 @@
-package com.smitestats.matchidservice.helpers
+package com.smitestats.datacollectorservice.helpers
 
 import cats._
 import cats.implicits._
@@ -7,8 +7,8 @@ import org.http4s.client.blaze._
 import org.http4s.client._
 import org.http4s.circe.CirceEntityDecoder._
 import scala.concurrent._
-import com.smitestats.matchidservice.config.AppConfig
-import com.smitestats.matchidservice.models.GetSessionResponse
+import com.smitestats.datacollectorservice.config.AppConfig
+import com.smitestats.datacollectorservice.models.GetSessionResponse
 import scalacache._
 import scalacache.guava._
 import scalacache.modes.scalaFuture._

@@ -1,4 +1,4 @@
-package com.smitestats.matchidservice.models
+package com.smitestats.datacollectorservice.models
 
 import io.circe.generic.JsonCodec
 

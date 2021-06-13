@@ -1,6 +1,6 @@
 import com.smitestats.Dependencies._
 
-name := """match-id-service"""
+name := """data-collector-service"""
 
 lazy val commons = Seq(
     version := "2.0.0-SNAPSHOT",    
@@ -35,7 +35,7 @@ lazy val service = project
             SLF4J.api,
             SLF4J.simple
         ),
-        assembly / mainClass := Some("com.smitestats.matchidservice.Main"),
+        assembly / mainClass := Some("com.smitestats.datacollectorservice.Main"),
         assembly / assemblyOption := (assembly / assemblyOption).value.copy(cacheUnzip = false),
         assembly / assemblyOption := (assembly / assemblyOption).value.copy(cacheOutput = false),
         assembly / assemblyMergeStrategy := {

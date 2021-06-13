@@ -1,10 +1,10 @@
-package com.smitestats.matchidservice.clients
+package com.smitestats.datacollectorservice.clients
 
-import com.smitestats.matchidservice.helpers.SignatureHelper
-import com.smitestats.matchidservice.helpers.SessionHelper
-import com.smitestats.matchidservice.config.AppConfig
-import com.smitestats.matchidservice.models.GetMatchIdsByQueueResponse
-import com.smitestats.matchidservice.models.GetMatchDetailsBatchResponse
+import com.smitestats.datacollectorservice.helpers.SignatureHelper
+import com.smitestats.datacollectorservice.helpers.SessionHelper
+import com.smitestats.datacollectorservice.config.AppConfig
+import com.smitestats.datacollectorservice.models.GetMatchIdsByQueueResponse
+import com.smitestats.datacollectorservice.models.GetMatchDetailsBatchResponse
 
 import cats._
 import cats.implicits._
