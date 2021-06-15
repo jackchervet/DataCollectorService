@@ -3,7 +3,7 @@ import com.smitestats.Dependencies._
 name := """data-collector-service"""
 
 lazy val commons = Seq(
-    version := "2.0.0-SNAPSHOT",    
+    version := "2.0.2-SNAPSHOT",
     scalaVersion := "2.13.6",
     organization := "com.smitestats",
     scalacOptions += "-Ymacro-annotations"
