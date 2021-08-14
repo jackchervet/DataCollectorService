@@ -42,15 +42,16 @@ object SmiteApiClient {
 
     def getHourValuesFormatted: List[String] = {
         val minutes = List("00", "10", "20", "30", "40", "50")
-        val hour = getHourTwoHoursPrev
-        minutes.map(m => s"${hour},${m}")
+        val hours = (10 to 18).toList
+        hours.map(_.toString).map(hour => minutes.map(m => s"${hour},${m}")).flatten
+        // minutes.map(m => s"${hour},${m}")
     }
 
     def pullRandomIndicies(window: List[String]): List[String] = {
         (1 to matchesPerWindow).toList
             .map(_ => Random.nextInt(window.length))
             .toSet
-            .map(i => window(i))
+            .map(window(_))
             .toList
     }
 
@@ -58,11 +59,11 @@ object SmiteApiClient {
         resps.map { window =>
             window.filter(r => r.Active_Flag == "n").map(r => r.Match)
         }
-        .map(window => pullRandomIndicies(window))
+        // .map(window => pullRandomIndicies(window))
         .flatten
     }
 
-    def getMatchIdsByQueue(queue: Int)(implicit 
+    def getMatchIdsByQueue(queue: Int, session: String)(implicit 
         client: Client[IO], 
         sessionCache: Cache[String], 
         ec: ExecutionContext, 
@@ -72,7 +73,6 @@ object SmiteApiClient {
         for {
             timestamp <- IO { SignatureHelper.getCurrentTimestamp }
             signature <- SignatureHelper.generateSignature(endpoints.getMatchIdsByQueue, timestamp)
-            session <- SessionHelper.getSession
             targets <- IO(getHourValuesFormatted.map { hour =>
                 s"${config.smiteApiBaseUrl}/" +
                 s"${endpoints.getMatchIdsByQueue}/" +
@@ -81,7 +81,7 @@ object SmiteApiClient {
                 s"${session}/" +
                 s"${timestamp}/" +
                 s"${queue}/" +
-                s"${getDateTwoHoursPrev}/" +
+                s"20210809/" +
                 s"${hour}"
             })
             resps <- targets.map { target =>
@@ -90,7 +90,7 @@ object SmiteApiClient {
         } yield flattenResponses(resps)
     }
 
-    def getMatchDetailsBatch(ids: List[String])(implicit 
+    def getMatchDetailsBatch(ids: List[String], session: String)(implicit 
         client: Client[IO], 
         sessionCache: Cache[String], 
         ec: ExecutionContext, 
@@ -100,7 +100,6 @@ object SmiteApiClient {
         for {
             timestamp <- IO { SignatureHelper.getCurrentTimestamp }
             signature <- SignatureHelper.generateSignature(endpoints.getMatchDetailsBatch, timestamp)
-            session <- SessionHelper.getSession
             target <- IO {
                 s"${config.smiteApiBaseUrl}/" +
                 s"${endpoints.getMatchDetailsBatch}/" +

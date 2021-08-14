@@ -29,6 +29,7 @@ class Main {
     implicit val cs: ContextShift[IO] = IO.contextShift(ec) 
     implicit val sessionCache: Cache[String] = GuavaCache[String]
     implicit val ddb: DynamoDbClient = DynamoDbClient.create()
+    implicit val blocker: Blocker = Blocker.liftExecutionContext(ec)
 
     def run(input: InputStream, output: OutputStream, context: Context): Unit = {
         (for {
@@ -36,7 +37,7 @@ class Main {
             config <- AppConfig.loaded
             _ <- IO { logger.info("Beginning processing...") }
             _ <- BlazeClientBuilder[IO](ec).resource.use { client =>
-                Processor.process(ec, cs, config, client, sessionCache, ddb)
+                Processor.process(outputToDDB = true)(ec, cs, config, client, sessionCache, blocker, ddb)
             }
         } yield ()).unsafeRunSync
     }
