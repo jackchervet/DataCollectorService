@@ -27,7 +27,7 @@ import scala.util.Random
 
 object SmiteApiClient {
 
-    final val matchesPerWindow = 10;
+    final val matchesPerWindow = 5000;
 
     val logger: Logger = LoggerFactory.getLogger("SmiteApiClient")
 
@@ -42,13 +42,12 @@ object SmiteApiClient {
 
     def getHourValuesFormatted: List[String] = {
         val minutes = List("00", "10", "20", "30", "40", "50")
-        val hours = (10 to 18).toList
-        hours.map(_.toString).map(hour => minutes.map(m => s"${hour},${m}")).flatten
-        // minutes.map(m => s"${hour},${m}")
+        val hour = getHourTwoHoursPrev
+        minutes.map(m => s"${hour},${m}")
     }
 
     def pullRandomIndicies(window: List[String]): List[String] = {
-        (1 to matchesPerWindow).toList
+        (1 to Math.min(window.length, matchesPerWindow)).toList
             .map(_ => Random.nextInt(window.length))
             .toSet
             .map(window(_))
@@ -59,7 +58,7 @@ object SmiteApiClient {
         resps.map { window =>
             window.filter(r => r.Active_Flag == "n").map(r => r.Match)
         }
-        // .map(window => pullRandomIndicies(window))
+        .map(window => pullRandomIndicies(window))
         .flatten
     }
 
@@ -81,7 +80,7 @@ object SmiteApiClient {
                 s"${session}/" +
                 s"${timestamp}/" +
                 s"${queue}/" +
-                s"20210809/" +
+                s"${getDateTwoHoursPrev}/" +
                 s"${hour}"
             })
             resps <- targets.map { target =>
