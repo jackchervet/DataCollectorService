@@ -9,8 +9,7 @@ case class AppConfig(
     devId: String,
     authKey: String,
     smiteApiBaseUrl: String,
-    downstreamSqs: String,
-    matchDataTableName: String
+    downstreamS3: String
 )
 
 object AppConfig {

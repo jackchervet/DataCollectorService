@@ -17,7 +17,7 @@ import com.smitestats.datacollectorservice.models.GetMatchDetailsBatchResponse
 import cats.effect.Blocker
 import io.circe.syntax._
 import com.smitestats.datacollectorservice.helpers.SessionHelper
-import software.amazon.awssdk.services.dynamodb.DynamoDbAsyncClient
+import software.amazon.awssdk.services.s3.S3AsyncClient
 
 object Processor {
     val logger: Logger = LoggerFactory.getLogger("Processor")
@@ -29,7 +29,7 @@ object Processor {
         client: Client[IO],
         sessionCache: Cache[String],
         blocker: Blocker,
-        ddb: DynamoDbAsyncClient
+        s3: S3AsyncClient
     ): IO[Unit] = {
         for {
             session <- SessionHelper.getSession
@@ -47,9 +47,8 @@ object Processor {
                 }
                 .compile
                 .fold(List.empty[List[GetMatchDetailsBatchResponse]])((aggr, list) => aggr :++ list)
-            _ <- 
-                if (outputToDDB) DDB.batchWriteItems(matchDetails)
-                else FileWriter.writeFile(matchDetails)
+            output <- FileWriter.writeFile(matchDetails)
+            _ <- S3.putObject(output)
         } yield ()
     }
 }

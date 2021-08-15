@@ -20,7 +20,7 @@ import scala.io.Source
 
 import io.circe.parser._
 import io.circe.syntax._
-import software.amazon.awssdk.services.dynamodb.DynamoDbAsyncClient
+import software.amazon.awssdk.services.s3.S3AsyncClient
 
 class Main {
 
@@ -28,7 +28,7 @@ class Main {
     implicit val ec: ExecutionContext = ExecutionContext.global
     implicit val cs: ContextShift[IO] = IO.contextShift(ec) 
     implicit val sessionCache: Cache[String] = GuavaCache[String]
-    implicit val ddb: DynamoDbAsyncClient = DynamoDbAsyncClient.create()
+    implicit val s3: S3AsyncClient = S3AsyncClient.create()
     implicit val blocker: Blocker = Blocker.liftExecutionContext(ec)
 
     def run(input: InputStream, output: OutputStream, context: Context): Unit = {
@@ -37,7 +37,7 @@ class Main {
             config <- AppConfig.loaded
             _ <- IO { logger.info("Beginning processing...") }
             _ <- BlazeClientBuilder[IO](ec).resource.use { client =>
-                Processor.process(outputToDDB = true)(ec, cs, config, client, sessionCache, blocker, ddb)
+                Processor.process(outputToDDB = true)(ec, cs, config, client, sessionCache, blocker, s3)
             }
         } yield ()).unsafeRunSync
     }

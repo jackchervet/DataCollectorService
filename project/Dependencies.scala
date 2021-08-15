@@ -5,7 +5,7 @@ import sbt._
 object Dependencies {
     object AWS {
         val lambda = "com.amazonaws" % "aws-lambda-java-core" % "1.2.1"
-        val dynamodb = "software.amazon.awssdk" % "dynamodb" % "2.16.78" 
+        val s3 = "software.amazon.awssdk" % "s3" % "2.16.78" 
     }
     
     object Cats {

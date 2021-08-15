@@ -3,7 +3,7 @@ import com.smitestats.Dependencies._
 name := """data-collector-service"""
 
 lazy val commons = Seq(
-    version := "3.0.5",
+    version := "4.0.1",
     scalaVersion := "2.13.6",
     organization := "com.smitestats",
     scalacOptions += "-Ymacro-annotations"
@@ -16,7 +16,7 @@ lazy val service = project
         commons,
         libraryDependencies ++= Seq(
             AWS.lambda,
-            AWS.dynamodb,
+            AWS.s3,
             Cats.core,
             Cats.effect,
             Circe.core,

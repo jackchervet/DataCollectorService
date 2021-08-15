@@ -24,6 +24,7 @@ import java.time.format.DateTimeFormatter
 import org.slf4j.LoggerFactory
 import org.slf4j.Logger
 import scala.util.Random
+import com.smitestats.datacollectorservice.helpers.TemporalHelpers._
 
 object SmiteApiClient {
 
@@ -35,10 +36,6 @@ object SmiteApiClient {
         val getMatchIdsByQueue = "getmatchidsbyqueueJson"
         val getMatchDetailsBatch = "getmatchdetailsbatchJson"
     }
-
-    private def getDateTwoHoursPrev: String = LocalDateTime.now(ZoneOffset.UTC).minusHours(2).format(DateTimeFormatter.ofPattern("yyyyMMdd"))
-    private def getHourTwoHoursPrev: Int = LocalDateTime.now(ZoneOffset.UTC).minusHours(2).format(DateTimeFormatter.ofPattern("HH")).toInt
-    private def getCurrentMinute: Int = LocalDateTime.now(ZoneOffset.UTC).format(DateTimeFormatter.ofPattern("mm")).toInt
 
     def getHourValuesFormatted: List[String] = {
         val minutes = List("00", "10", "20", "30", "40", "50")
