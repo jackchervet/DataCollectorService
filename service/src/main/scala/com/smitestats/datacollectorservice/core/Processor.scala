@@ -14,10 +14,10 @@ import org.slf4j.LoggerFactory
 import fs2.io._
 import fs2.Stream
 import com.smitestats.datacollectorservice.models.GetMatchDetailsBatchResponse
-import software.amazon.awssdk.services.dynamodb.DynamoDbClient
 import cats.effect.Blocker
 import io.circe.syntax._
 import com.smitestats.datacollectorservice.helpers.SessionHelper
+import software.amazon.awssdk.services.dynamodb.DynamoDbAsyncClient
 
 object Processor {
     val logger: Logger = LoggerFactory.getLogger("Processor")
@@ -29,7 +29,7 @@ object Processor {
         client: Client[IO],
         sessionCache: Cache[String],
         blocker: Blocker,
-        ddb: DynamoDbClient
+        ddb: DynamoDbAsyncClient
     ): IO[Unit] = {
         for {
             session <- SessionHelper.getSession

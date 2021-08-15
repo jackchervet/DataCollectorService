@@ -19,11 +19,12 @@ import java.nio.file.StandardOpenOption
 import com.smitestats.datacollectorservice.helpers.StatHelpers
 
 object FileWriter {
-    val logger: Logger = LoggerFactory.getLogger("FileWriteHelpers")
+    val logger: Logger = LoggerFactory.getLogger("FileWriter")
     val headerRow: String = "Match_Id,God_Name,God_Id,Role,Item_1_Id,Item_1_Name,Item_2_Id,Item_2_Name,Item_3_Id,Item_3_Name,Item_4_Id,Item_4_Name,Item_5_Id,Item_5_Name,Item_6_Id,Item_6_Name,Active_1_Id,Active_1_Name,Active_2_Id,Active_2_Name,Active_3_Id,Active_3_Name,Active_4_Id,Active_4_Name,Player_Damage,Max_Player_Damage,Player_Damage_Score,Damage_Mitigated,Max_Damage_Mitigated,Damage_Mitigated_Score,KDA,Max_KDA,KDA_Score,Gold_Earned,Max_Gold_Earned,Gold_Earned_Score,Structure_Damage,Max_Structure_Damage,Structure_Damage_Score,Auto_Attack_Damage,Max_Auto_Attack_Damage,Auto_Attack_Damage_Score,Magical_Damage,Max_Magical_Damage,Magical_Damage_Score,Physical_Damage,Max_Physical_Damage,Physical_Damage_Score,Win\n"
 
     def writeFile(items: List[List[GetMatchDetailsBatchResponse]])(implicit config: AppConfig, cs: ContextShift[IO], blocker: Blocker): IO[Unit] = {
         for {
+            _ <- IO { logger.info("Writing file...") }
             _ <- Stream.emit(headerRow)
                 .through(fs2.text.utf8Encode)
                 .through(fs2.io.file.writeAll[IO](Paths.get("matchData_large.csv"), blocker))

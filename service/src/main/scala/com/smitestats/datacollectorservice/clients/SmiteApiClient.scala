@@ -27,7 +27,7 @@ import scala.util.Random
 
 object SmiteApiClient {
 
-    final val matchesPerWindow = 5000;
+    final val matchesPerWindow = 2000;
 
     val logger: Logger = LoggerFactory.getLogger("SmiteApiClient")
 

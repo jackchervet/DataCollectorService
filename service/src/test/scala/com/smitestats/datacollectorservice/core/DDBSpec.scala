@@ -47,9 +47,9 @@ class DDBSpec extends AnyWordSpec with Matchers {
 
   "DDB" should {
       "Create attributes" in {
-        val map = DDB.matchDataTransformer(List(GetMatchDetailsBatchResponse(Entry_Datetime = "6/8/2021 3:02:32 AM"))).compile.lastOrError.unsafeRunSync
-        val timestamp = map.get("timestamp").get.n
-        assert(timestamp == "1623121352000")
+        val map = DDB.matchDataTransformer(List(GetMatchDetailsBatchResponse(Match = 5L, Entry_Datetime = "6/8/2021 3:02:32 AM"))).compile.lastOrError.unsafeRunSync
+        val matchId = map.get("Match_Id").get.s
+        assert(matchId == "5")
       }
 
       "Build valid BatchWriteRequest" in {

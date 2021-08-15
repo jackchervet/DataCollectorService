@@ -20,7 +20,7 @@ import scala.io.Source
 
 import io.circe.parser._
 import io.circe.syntax._
-import software.amazon.awssdk.services.dynamodb.DynamoDbClient
+import software.amazon.awssdk.services.dynamodb.DynamoDbAsyncClient
 
 class Main {
 
@@ -28,7 +28,7 @@ class Main {
     implicit val ec: ExecutionContext = ExecutionContext.global
     implicit val cs: ContextShift[IO] = IO.contextShift(ec) 
     implicit val sessionCache: Cache[String] = GuavaCache[String]
-    implicit val ddb: DynamoDbClient = DynamoDbClient.create()
+    implicit val ddb: DynamoDbAsyncClient = DynamoDbAsyncClient.create()
     implicit val blocker: Blocker = Blocker.liftExecutionContext(ec)
 
     def run(input: InputStream, output: OutputStream, context: Context): Unit = {

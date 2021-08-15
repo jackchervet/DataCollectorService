@@ -5,38 +5,38 @@ import cats.effect._
 import io.circe.syntax._
 import scala.collection.JavaConverters._
 import com.smitestats.datacollectorservice.config.AppConfig
-import software.amazon.awssdk.services.dynamodb.model.AttributeValue
-import software.amazon.awssdk.services.dynamodb.model.BatchWriteItemRequest
-import software.amazon.awssdk.services.dynamodb.model.WriteRequest
-import software.amazon.awssdk.services.dynamodb.model.PutRequest
-import software.amazon.awssdk.services.dynamodb.DynamoDbClient
-import org.slf4j.Logger
-import org.slf4j.LoggerFactory
-import software.amazon.awssdk.services.dynamodb.model.BatchWriteItemResponse
-import java.time.LocalDateTime
-import java.time.ZoneOffset
+import software.amazon.awssdk.services.dynamodb.model.{ AttributeValue, BatchWriteItemRequest, BatchWriteItemResponse, WriteRequest, PutRequest }
+import org.slf4j.{ Logger, LoggerFactory }
+import java.time.{ LocalDateTime, ZoneOffset }
 import java.time.format.DateTimeFormatter
 import com.smitestats.datacollectorservice.models.GetMatchDetailsBatchResponse
-import com.smitestats.datacollectorservice.helpers.StatHelpers
+import com.smitestats.datacollectorservice.helpers.{ StatHelpers, IOUtils }
+import scala.util.Random
+import scala.concurrent.ExecutionContext
+import software.amazon.awssdk.services.dynamodb.DynamoDbAsyncClient
 
-
-object DDB {
+object DDB extends IOUtils {
     val logger: Logger = LoggerFactory.getLogger("DDB")
     private final val DDB_MAX_BATCH_WRITE: Int = 25
+    private final val MAX_CONCURRENT = 20
 
-    def batchWriteItems(items: List[List[GetMatchDetailsBatchResponse]])(implicit config: AppConfig, client: DynamoDbClient): IO[Unit] = {
+    def batchWriteItems(items: List[List[GetMatchDetailsBatchResponse]])(implicit config: AppConfig, client: DynamoDbAsyncClient, cs: ContextShift[IO], ec: ExecutionContext): IO[Unit] = {
         Stream.emits(items)
-            .evalMap { matchData => IO { matchDataTransformer(matchData) } }
-            .flatten
-            .chunkLimit(DDB_MAX_BATCH_WRITE)
-            .evalMapChunk { chunk =>
-                buildBatchWriteItemRequest(config.matchDataTableName, chunk.toList)
+            .evalMap { matchData => IO {
+                 matchDataTransformer(matchData)
+                    .chunkLimit(DDB_MAX_BATCH_WRITE)
+                    .evalMapChunk { chunk =>
+                        for {
+                            req <- buildBatchWriteItemRequest(config.matchDataTableName, chunk.toList)
+                            _ <- IO { logger.info(s"Writing to DDB: ${req}")}
+                            _ <- fromJavaFuture(client.batchWriteItem(req)).handleErrorWith { e => 
+                                IO(logger.error(s"[ERROR] Failed to write items to DDB: ${e}")) *> IO(BatchWriteItemResponse.builder().build())
+                            } 
+                        } yield ()
+                    }
+                }
             }
-            .evalMap { req =>
-                IO(client.batchWriteItem(req)).handleErrorWith { e => 
-                    IO(logger.error(s"[ERROR] Failed to write items to DDB: ${e}")) *> IO(BatchWriteItemResponse.builder().build())
-                } 
-            }
+            .parJoin(MAX_CONCURRENT)
             .compile
             .drain
     }
@@ -60,12 +60,15 @@ object DDB {
     def avN(value: String): AttributeValue = AttributeValue.builder.n(value).build
     def avS(value: String): AttributeValue = AttributeValue.builder.s(value).build
 
+    // DDB Items can't have the same partition + sort key, so add random noise to the timestamp.
+    def getRandomMillis(): Long = Random.between(0, 60000)
+    
     def matchDataTransformer(matchData: List[GetMatchDetailsBatchResponse]): Stream[IO, Map[String, AttributeValue]] = {
         val tuple = (matchData, StatHelpers.findMaxValues(matchData))       
         Stream.emits(tuple._1.map { playerData =>
             Map(
                 "date" -> avS(LocalDateTime.now(ZoneOffset.UTC).format(DateTimeFormatter.ofPattern("yyyyMMdd")).toString),
-                "timestamp" -> avN(LocalDateTime.parse(playerData.Entry_Datetime, DateTimeFormatter.ofPattern("M/d/yyyy h:mm:ss a")).toInstant(ZoneOffset.UTC).toEpochMilli.toString),
+                "timestamp" -> avN(LocalDateTime.parse(playerData.Entry_Datetime, DateTimeFormatter.ofPattern("M/d/yyyy h:mm:ss a")).toInstant(ZoneOffset.UTC).plusMillis(getRandomMillis).toEpochMilli.toString),
                 "Match_Id" -> avS(s"${playerData.Match}"),
                 "God_Name" -> avS(playerData.Reference_Name.getOrElse("na")),
                 "God_Id" -> avS(s"${playerData.GodId.getOrElse(-1L)}"),
